@@ -1,7 +1,7 @@
 # Учебный проект «Код и Магия» [![Build status][travis-image]][travis-url]
 
 * Студент: [Алексей Носиков](https://up.htmlacademy.ru/javascript/16/user/785179).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Шамрило](https://up.htmlacademy.ru/javascript/16/user/59460).
 
 ---
 
