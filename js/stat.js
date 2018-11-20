@@ -38,8 +38,10 @@ var getMaxElement = function (arr) {
 };
 
 // функция получения случайного числа в диапазоне (min, 1)
-function getRandomArbitary(min) {
-  return Math.random() * (1 - min) + min;
+function getRandomColor(hue) {
+  var s = Math.floor(Math.random() * 100);
+  var color = 'hsl(' + hue + ', ' + s + '%, ' + '50%)';
+  return color;
 }
 
 // функция отрисовки статистики
@@ -48,7 +50,7 @@ var renderHistogram = function (ctx, i, textLinesLength, players, times) {
 
   // выводятся результаты в милисекундах
   ctx.fillStyle = 'rgba(0, 0, 0, 1)';
-  ctx.fillText(Math.round(times[i - textLinesLength]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_Y + TEXT_HEIGHT * (textLinesLength + 1.5)); // 1.5 - это коэффициент для правильного отступа результатов в милисекундах
+  ctx.fillText(Math.round(times[i - textLinesLength]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - GAP - (barHeight - TEXT_HEIGHT * (textLinesLength - 1)) * times[i - textLinesLength] / maxTime);
 
   // выводятся имена игроков
   ctx.fillText(players[i - textLinesLength], CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - TEXT_HEIGHT);
@@ -57,8 +59,8 @@ var renderHistogram = function (ctx, i, textLinesLength, players, times) {
     // окрашивания столбца с именем 'Вы' в красный цвет
     ctx.fillStyle = 'rgba(255, 0, 0, 1)';
   } else {
-    // окрашивания остальных столбцов в синий цвет со случайной насыщенностью
-    ctx.fillStyle = 'rgba(0, 0, 255, ' + getRandomArbitary(0.1) + ')';
+    // окрашивания остальных столбцов в синий цвет (hue = 240) со случайной насыщенностью
+    ctx.fillStyle = getRandomColor(240);
   }
 
   // отрисовываются столбцы
