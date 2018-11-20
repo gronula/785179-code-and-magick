@@ -22,7 +22,7 @@
   "scripts": {
     "test": "eslint js/",
     "build": "gulp build",
-    "start": "gulp server"
+    "start": "gulp start"
   },
   "engines": {
     "node": "8.11"
