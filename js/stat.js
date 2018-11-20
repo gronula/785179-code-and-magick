@@ -10,6 +10,7 @@ var TEXT_HEIGHT = 20; // высота строки текста
 var BAR_WIDTH = 40; // ширина столбца
 var barHeight = CLOUD_HEIGHT - GAP - TEXT_HEIGHT - GAP; // высота столбца = высота облака - промежуток сверху - высота строки - промежуток снизу
 
+// функция отрисовки облака
 var renderCloud = function (ctx, x, y, color) {
   ctx.fillStyle = color;
   ctx.beginPath();
@@ -25,17 +26,46 @@ var renderCloud = function (ctx, x, y, color) {
   ctx.fill();
 };
 
-var renderHistogram = function (ctx, i, textLinesLength, players, times) {
-  // сначала выводятся результаты в милисекундах
-  ctx.fillText(Math.round(times[i - textLinesLength]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_Y + TEXT_HEIGHT * (textLinesLength + 1.5));
-
-  // затем отрисовываются столбцы
-  ctx.fillRect(CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - TEXT_HEIGHT * 2, BAR_WIDTH, TEXT_HEIGHT * (textLinesLength - 1) - barHeight); // 2 - это коэффициент для правильного отступа стобцов
-
-  // в конце выводятся имена игроков
-  ctx.fillText(players[i - textLinesLength], CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - TEXT_HEIGHT);
+// функция поиска максимального элемента
+var getMaxElement = function (arr) {
+  var maxElement = arr[0];
+  for (var i = 1; i < arr.length; i++) {
+    if (arr[i] > maxElement) {
+      maxElement = arr[i];
+    }
+  }
+  return maxElement;
 };
 
+// функция получения случайного числа в диапазоне (min, 1)
+function getRandomArbitary(min) {
+  return Math.random() * (1 - min) + min;
+}
+
+// функция отрисовки статистики
+var renderHistogram = function (ctx, i, textLinesLength, players, times) {
+  var maxTime = getMaxElement(times);
+
+  // выводятся результаты в милисекундах
+  ctx.fillStyle = 'rgba(0, 0, 0, 1)';
+  ctx.fillText(Math.round(times[i - textLinesLength]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_Y + TEXT_HEIGHT * (textLinesLength + 1.5)); // 1.5 - это коэффициент для правильного отступа результатов в милисекундах
+
+  // выводятся имена игроков
+  ctx.fillText(players[i - textLinesLength], CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - TEXT_HEIGHT);
+
+  if (players[i - textLinesLength] === 'Вы') {
+    // окрашивания столбца с именем 'Вы' в красный цвет
+    ctx.fillStyle = 'rgba(255, 0, 0, 1)';
+  } else {
+    // окрашивания остальных столбцов в синий цвет со случайной насыщенностью
+    ctx.fillStyle = 'rgba(0, 0, 255, ' + getRandomArbitary(0.1) + ')';
+  }
+
+  // отрисовываются столбцы
+  ctx.fillRect(CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLinesLength), CLOUD_HEIGHT - TEXT_HEIGHT * 2, BAR_WIDTH, (TEXT_HEIGHT * (textLinesLength - 1) - barHeight) * times[i - textLinesLength] / maxTime); // 2 - это коэффициент для правильного отступа стобцов
+};
+
+// функция отрисовки статистики и текста перед ней
 window.renderStatistics = function (ctx, players, times) {
   renderCloud(ctx, 110, 20, 'rgba(0, 0, 0, 0.7)');
   renderCloud(ctx, 100, 10, '#ffffff');
@@ -45,45 +75,31 @@ window.renderStatistics = function (ctx, players, times) {
     'Ура вы победили!',
     'Список результатов:'
   ];
-  // var players = ['1', '2', '3', '4', '5'];
-  // var times = ['1', '2', '3', '4', '5'];
 
   ctx.fillStyle = '#000000';
   ctx.font = '16px PT Mono';
+
+  // проверка на равенство длин массивов players и times
+  if (times.length < players.length) {
+    // урезание длины массива players до длины массива times
+    players.length = times.length;
+  } else {
+    // урезание длины массива times до длины массива players
+    times.length = players.length;
+  }
 
   // цикл для вывода текста и статистики независимо от количества строк в тексте перед статистикой
   for (var i = 0; i < players.length + textLines.length; i++) {
     // условие проверяет количество строк текста перед статистикой и выводит только первые 3 строки
     if (i < textLines.length && i < 3) {
       ctx.fillText(textLines[i], CLOUD_X, CLOUD_Y + TEXT_HEIGHT * (i + 1));
-    } else if (players.length <= 4) {
+    } else if (i < players.length + textLines.length && i < textLines.length + 4 && i < 7) {
       // условие для проверки количества строк в тексте перед статистикой
       if (textLines.length <= 3) {
         renderHistogram(ctx, i, textLines.length, players, times);
-        // // отрисовка столбцов результатов с учетом длины массива textLines
-        // // сначала выводятся результаты в милисекундах
-        // ctx.fillText(Math.round(times[i - textLines.length]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLines.length), CLOUD_Y + TEXT_HEIGHT * (textLines.length + 1.5));
-
-        // // затем отрисовываются столбцы
-        // ctx.fillRect(CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLines.length), CLOUD_HEIGHT - TEXT_HEIGHT * 2, BAR_WIDTH, TEXT_HEIGHT * (textLines.length - 1) - barHeight); // 2 - это коэффициент для правильного отступа стобцов
-
-        // // в конце выводятся имена игроков
-        // ctx.fillText(players[i - textLines.length], CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - textLines.length), CLOUD_HEIGHT - TEXT_HEIGHT);
       } else if (i < players.length + 3) {
         renderHistogram(ctx, i, 3, players, times);
-        // // отрисовка столбцов результатов в случае, если длина массива textLines больше 3
-        // // ограничение (i < players.length + 3) нужно, чтобы не выводились несуществующие элементы массивов
-        // // сначала выводятся результаты в милисекундах
-        // ctx.fillText(Math.round(times[i - 3]), CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - 3), CLOUD_Y + TEXT_HEIGHT * 4.5); // 4.5 - это коэффициент для правильного позиционирования верхней границы текста
-
-        // // затем отрисовываются столбцы
-        // ctx.fillRect(CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - 3), CLOUD_HEIGHT - TEXT_HEIGHT * 2, BAR_WIDTH, TEXT_HEIGHT * 2 - barHeight); // 2 - это коэффициент для правильного отступа стобцов
-
-        // // в конце выводятся имена игроков
-        // ctx.fillText(players[i - 3], CLOUD_X + FONT_GAP + (GAP + BAR_WIDTH) * (i - 3), CLOUD_HEIGHT - TEXT_HEIGHT);
       }
-    } else {
-      this.alert('!!!');
     }
   }
 };
