@@ -1,10 +1,6 @@
 'use strict';
 
-var userDialog = document.querySelector('.setup');
-userDialog.classList.remove('hidden');
-
-document.querySelector('.setup-similar').classList.remove('hidden');
-
+// массив имён
 var WIZARD_NAMES = [
   'Иван',
   'Хуан Себастьян',
@@ -16,6 +12,7 @@ var WIZARD_NAMES = [
   'Вашингтон'
 ];
 
+// массив фамилий
 var WIZARD_SURNAMES = [
   'да Марья',
   'Верон',
@@ -27,6 +24,7 @@ var WIZARD_SURNAMES = [
   'Ирвинг'
 ];
 
+// массив цветов плащей
 var COAT_COLORS = [
   'rgb(101, 137, 164)',
   'rgb(241, 43, 107)',
@@ -36,6 +34,7 @@ var COAT_COLORS = [
   'rgb(0, 0, 0)'
 ];
 
+// массив цветов глаз
 var EYES_COLORS = [
   'black',
   'red',
@@ -44,18 +43,59 @@ var EYES_COLORS = [
   'green'
 ];
 
-var wizards = [];
-
-function getRandomElement(array) {
+// функция вовзращает случайный элемент из массива array
+function getRandomInt(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
-for (var i = 0; i < 4; i++) {
-  wizards.push({
-    name: getRandomElement(WIZARD_NAMES) + ' ' + getRandomElement(WIZARD_SURNAMES),
-    coatColor: getRandomElement(COAT_COLORS),
-    eyesColor: getRandomElement(EYES_COLORS),
-  });
+// функция возвращает массив, состоящий из arrayLength объектов
+var getRandomArray = function (arrayLength) {
+  var array = [];
+
+  for (var i = 0; i < arrayLength; i++) {
+    var object = {};
+
+    object.name = getRandomInt(WIZARD_NAMES) + ' ' + getRandomInt(WIZARD_SURNAMES);
+    object.coatColor = getRandomInt(COAT_COLORS);
+    object.eyesColor = getRandomInt(EYES_COLORS);
+
+    array.push(object);
+  }
+
+  return array;
+};
+
+var wizards = getRandomArray(4);
+
+var userDialog = document.querySelector('.setup');
+// удаляем класс hidden у элемента с классом setup
+userDialog.classList.remove('hidden');
+
+var similarListElement = document.querySelector('.setup-similar-list');
+var simimlarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
+var fragment = document.createDocumentFragment();
+
+// функция возвращает элемент, который используется в качестве шаблона
+var renderWizard = function (wizard) {
+  var wizardElement = simimlarWizardTemplate.cloneNode(true);
+
+  // меняем имя волшебника, которое берётся из массива wizard
+  wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
+  // меняем цвет плаща волшебника
+  wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor;
+  // меняем цвет глаз волшебника
+  wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor;
+
+  return wizardElement;
+};
+
+// в цикле добавляем элементы в DocumentFragment, чтобы не перерисовывать страницу каждый раз
+for (var i = 0; i < wizards.length; i++) {
+  fragment.appendChild(renderWizard(wizards[i]));
 }
 
-console.log(wizards);
+// выводим содержимое DocumentFragment в DOM
+similarListElement.appendChild(fragment);
+
+// удаляем класс hidden у блока "Похожие персонажи"
+userDialog.querySelector('.setup-similar').classList.remove('hidden');
