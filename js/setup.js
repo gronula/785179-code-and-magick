@@ -72,12 +72,12 @@ var userDialog = document.querySelector('.setup');
 userDialog.classList.remove('hidden');
 
 var similarListElement = document.querySelector('.setup-similar-list');
-var simimlarWizardTemplate = document.querySelector('#similar-wizard-template').content.querySelector('.setup-similar-item');
+var similarWizardTemplate = document.querySelector('#similar-wizard-template');var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
 var fragment = document.createDocumentFragment();
 
 // функция возвращает элемент, который используется в качестве шаблона
 var renderWizard = function (wizard) {
-  var wizardElement = simimlarWizardTemplate.cloneNode(true);
+  var wizardElement = similarItem.cloneNode(true);
 
   // меняем имя волшебника, которое берётся из массива wizard
   wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
