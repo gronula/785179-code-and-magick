@@ -72,7 +72,8 @@ var userDialog = document.querySelector('.setup');
 userDialog.classList.remove('hidden');
 
 var similarListElement = document.querySelector('.setup-similar-list');
-var similarWizardTemplate = document.querySelector('#similar-wizard-template');var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
+var similarWizardTemplate = document.querySelector('#similar-wizard-template');
+var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
 var fragment = document.createDocumentFragment();
 
 // функция возвращает элемент, который используется в качестве шаблона
