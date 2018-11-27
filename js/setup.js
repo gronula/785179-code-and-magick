@@ -43,8 +43,19 @@ var EYES_COLORS = [
   'green'
 ];
 
+var FIREBALLS_COLORS = [
+  '#ee4830',
+  '#30a8ee',
+  '#5ce6c0',
+  '#e848d5',
+  '#e6e848'
+];
+
+var ESC_KEYCODE = 27;
+var ENTER_KEYCODE = 13;
+
 // функция вовзращает случайный элемент из массива array
-function getRandomInt(array) {
+function getRandomArrayElement(array) {
   return array[Math.floor(Math.random() * array.length)];
 }
 
@@ -55,9 +66,9 @@ var getRandomArray = function (arrayLength) {
   for (var i = 0; i < arrayLength; i++) {
     var object = {};
 
-    object.name = getRandomInt(WIZARD_NAMES) + ' ' + getRandomInt(WIZARD_SURNAMES);
-    object.coatColor = getRandomInt(COAT_COLORS);
-    object.eyesColor = getRandomInt(EYES_COLORS);
+    object.name = getRandomArrayElement(WIZARD_NAMES) + ' ' + getRandomArrayElement(WIZARD_SURNAMES);
+    object.coatColor = getRandomArrayElement(COAT_COLORS);
+    object.eyesColor = getRandomArrayElement(EYES_COLORS);
 
     array.push(object);
   }
@@ -67,36 +78,101 @@ var getRandomArray = function (arrayLength) {
 
 var wizards = getRandomArray(4);
 
-var userDialog = document.querySelector('.setup');
-// удаляем класс hidden у элемента с классом setup
-userDialog.classList.remove('hidden');
-
-var similarListElement = document.querySelector('.setup-similar-list');
-var similarWizardTemplate = document.querySelector('#similar-wizard-template');
-var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
-var fragment = document.createDocumentFragment();
-
 // функция возвращает элемент, который используется в качестве шаблона
 var renderWizard = function (wizard) {
-  var wizardElement = similarItem.cloneNode(true);
+  var similarListElement = document.querySelector('.setup-similar-list');
+  var similarWizardTemplate = document.querySelector('#similar-wizard-template');
+  var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
+  var fragment = document.createDocumentFragment();
 
-  // меняем имя волшебника, которое берётся из массива wizard
-  wizardElement.querySelector('.setup-similar-label').textContent = wizard.name;
-  // меняем цвет плаща волшебника
-  wizardElement.querySelector('.wizard-coat').style.fill = wizard.coatColor;
-  // меняем цвет глаз волшебника
-  wizardElement.querySelector('.wizard-eyes').style.fill = wizard.eyesColor;
+  // в цикле добавляем элементы в DocumentFragment, чтобы не перерисовывать страницу каждый раз
+  for (var i = 0; i < wizard.length; i++) {
+    var wizardElement = similarItem.cloneNode(true);
 
-  return wizardElement;
+    // меняем имя волшебника, которое берётся из массива wizard
+    wizardElement.querySelector('.setup-similar-label').textContent = wizard[i].name;
+    // меняем цвет плаща волшебника
+    wizardElement.querySelector('.wizard-coat').style.fill = wizard[i].coatColor;
+    // меняем цвет глаз волшебника
+    wizardElement.querySelector('.wizard-eyes').style.fill = wizard[i].eyesColor;
+
+    fragment.appendChild(wizardElement);
+  }
+
+  // выводим содержимое DocumentFragment в DOM
+  similarListElement.appendChild(fragment);
 };
 
-// в цикле добавляем элементы в DocumentFragment, чтобы не перерисовывать страницу каждый раз
-for (var i = 0; i < wizards.length; i++) {
-  fragment.appendChild(renderWizard(wizards[i]));
-}
+renderWizard(wizards);
 
-// выводим содержимое DocumentFragment в DOM
-similarListElement.appendChild(fragment);
+var setupOpen = document.querySelector('.setup-open');
+var setup = document.querySelector('.setup');
+var setupClose = setup.querySelector('.setup-close');
+var setupUserName = setup.querySelector('.setup-user-name');
 
 // удаляем класс hidden у блока "Похожие персонажи"
-userDialog.querySelector('.setup-similar').classList.remove('hidden');
+setup.querySelector('.setup-similar').classList.remove('hidden');
+
+var onPopupEscPress = function (evt) {
+  if (evt.keyCode === ESC_KEYCODE) {
+    closePopup();
+  }
+};
+
+var openPopup = function () {
+  setup.classList.remove('hidden');
+  document.addEventListener('keydown', onPopupEscPress);
+};
+
+var closePopup = function () {
+  setup.classList.add('hidden');
+  document.removeEventListener('keydown', onPopupEscPress);
+};
+
+setupOpen.addEventListener('click', function () {
+  openPopup();
+});
+
+setupOpen.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    openPopup();
+  }
+});
+
+setupClose.addEventListener('click', function () {
+  closePopup();
+});
+
+setupClose.addEventListener('keydown', function (evt) {
+  if (evt.keyCode === ENTER_KEYCODE) {
+    closePopup();
+  }
+});
+
+setupUserName.addEventListener('focusin', function () {
+  document.removeEventListener('keydown', onPopupEscPress);
+});
+
+setupUserName.addEventListener('focusout', function () {
+  document.addEventListener('keydown', onPopupEscPress);
+});
+
+var changeWizardAttributes = function (element, hiddenInput, cssProperty, array) {
+  element.addEventListener('click', function () {
+    var color = getRandomArrayElement(array);
+    element.style[cssProperty] = color;
+    hiddenInput.value = color;
+  });
+};
+
+var setupWizardCoat = setup.querySelector('.setup-wizard .wizard-coat');
+var setupWizardCoatInput = setup.querySelector('input[name = coat-color]');
+changeWizardAttributes(setupWizardCoat, setupWizardCoatInput, 'fill', COAT_COLORS);
+
+var setupWizardEyes = setup.querySelector('.setup-wizard .wizard-eyes');
+var setupWizardEyesInput = setup.querySelector('input[name = eyes-color]');
+changeWizardAttributes(setupWizardEyes, setupWizardEyesInput, 'fill', EYES_COLORS);
+
+var setupFireball = setup.querySelector('.setup-fireball-wrap');
+var setupFireballInput = setup.querySelector('input[name = fireball-color]');
+changeWizardAttributes(setupFireball, setupFireballInput, 'backgroundColor', FIREBALLS_COLORS);
