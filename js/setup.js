@@ -139,14 +139,6 @@ var changeWizardAttributes = function (evt) {
   }
 };
 
-var addEvent = function (element) {
-  element.addEventListener('click', changeWizardAttributes);
-};
-
-var removeEvent = function (element) {
-  element.removeEventListener('click', changeWizardAttributes);
-};
-
 var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     closePopup();
@@ -158,9 +150,9 @@ var openPopup = function () {
     setup.classList.remove('hidden');
     document.addEventListener('keydown', onPopupEscPress);
 
-    addEvent(setupWizardCoat);
-    addEvent(setupWizardEyes);
-    addEvent(setupFireball);
+    setupWizardCoat.addEventListener('click', changeWizardAttributes);
+    setupWizardEyes.addEventListener('click', changeWizardAttributes);
+    setupFireball.addEventListener('click', changeWizardAttributes);
   }
 };
 
@@ -168,9 +160,9 @@ var closePopup = function () {
   setup.classList.add('hidden');
   document.removeEventListener('keydown', onPopupEscPress);
 
-  removeEvent(setupWizardCoat);
-  removeEvent(setupWizardEyes);
-  removeEvent(setupFireball);
+  setupWizardCoat.removeEventListener('click', changeWizardAttributes);
+  setupWizardEyes.removeEventListener('click', changeWizardAttributes);
+  setupFireball.removeEventListener('click', changeWizardAttributes);
 };
 
 setupOpen.addEventListener('click', function () {
