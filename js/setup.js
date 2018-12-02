@@ -113,6 +113,32 @@ var setupUserName = setup.querySelector('.setup-user-name');
 // удаляем класс hidden у блока "Похожие персонажи"
 setup.querySelector('.setup-similar').classList.remove('hidden');
 
+var setupWizardCoat = setup.querySelector('.setup-wizard .wizard-coat');
+var setupWizardCoatInput = setup.querySelector('input[name = coat-color]');
+
+var setupWizardEyes = setup.querySelector('.setup-wizard .wizard-eyes');
+var setupWizardEyesInput = setup.querySelector('input[name = eyes-color]');
+
+var setupFireball = setup.querySelector('.setup-fireball-wrap');
+var setupFireballInput = setup.querySelector('input[name = fireball-color]');
+
+var changingColor = function (element, hideInput, cssProperty, colorsArray) {
+  var color = getRandomArrayElement(colorsArray);
+  element.style[cssProperty] = color;
+  hideInput.value = color;
+};
+
+var changeWizardAttributes = function (evt) {
+  var className = evt.target.classList;
+  if (className.contains('wizard-coat')) {
+    changingColor(setupWizardCoat, setupWizardCoatInput, 'fill', COAT_COLORS);
+  } else if (className.contains('wizard-eyes')) {
+    changingColor(setupWizardEyes, setupWizardEyesInput, 'fill', EYES_COLORS);
+  } else if (className.contains('setup-fireball')) {
+    changingColor(setupFireball, setupFireballInput, 'backgroundColor', FIREBALLS_COLORS);
+  }
+};
+
 var onPopupEscPress = function (evt) {
   if (evt.keyCode === ESC_KEYCODE) {
     closePopup();
@@ -120,13 +146,23 @@ var onPopupEscPress = function (evt) {
 };
 
 var openPopup = function () {
-  setup.classList.remove('hidden');
-  document.addEventListener('keydown', onPopupEscPress);
+  if (setup.classList.contains('hidden')) {
+    setup.classList.remove('hidden');
+    document.addEventListener('keydown', onPopupEscPress);
+
+    setupWizardCoat.addEventListener('click', changeWizardAttributes);
+    setupWizardEyes.addEventListener('click', changeWizardAttributes);
+    setupFireball.addEventListener('click', changeWizardAttributes);
+  }
 };
 
 var closePopup = function () {
   setup.classList.add('hidden');
   document.removeEventListener('keydown', onPopupEscPress);
+
+  setupWizardCoat.removeEventListener('click', changeWizardAttributes);
+  setupWizardEyes.removeEventListener('click', changeWizardAttributes);
+  setupFireball.removeEventListener('click', changeWizardAttributes);
 };
 
 setupOpen.addEventListener('click', function () {
@@ -156,23 +192,3 @@ setupUserName.addEventListener('focusin', function () {
 setupUserName.addEventListener('focusout', function () {
   document.addEventListener('keydown', onPopupEscPress);
 });
-
-var changeWizardAttributes = function (element, hiddenInput, cssProperty, array) {
-  element.addEventListener('click', function () {
-    var color = getRandomArrayElement(array);
-    element.style[cssProperty] = color;
-    hiddenInput.value = color;
-  });
-};
-
-var setupWizardCoat = setup.querySelector('.setup-wizard .wizard-coat');
-var setupWizardCoatInput = setup.querySelector('input[name = coat-color]');
-changeWizardAttributes(setupWizardCoat, setupWizardCoatInput, 'fill', COAT_COLORS);
-
-var setupWizardEyes = setup.querySelector('.setup-wizard .wizard-eyes');
-var setupWizardEyesInput = setup.querySelector('input[name = eyes-color]');
-changeWizardAttributes(setupWizardEyes, setupWizardEyesInput, 'fill', EYES_COLORS);
-
-var setupFireball = setup.querySelector('.setup-fireball-wrap');
-var setupFireballInput = setup.querySelector('input[name = fireball-color]');
-changeWizardAttributes(setupFireball, setupFireballInput, 'backgroundColor', FIREBALLS_COLORS);
