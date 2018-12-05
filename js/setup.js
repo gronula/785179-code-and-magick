@@ -109,6 +109,7 @@ var setupOpen = document.querySelector('.setup-open');
 var setup = document.querySelector('.setup');
 var setupClose = setup.querySelector('.setup-close');
 var setupUserName = setup.querySelector('.setup-user-name');
+var setupHandle = setup.querySelector('.upload');
 
 // удаляем класс hidden у блока "Похожие персонажи"
 setup.querySelector('.setup-similar').classList.remove('hidden');
@@ -153,6 +154,8 @@ var openPopup = function () {
     setupWizardCoat.addEventListener('click', changeWizardAttributes);
     setupWizardEyes.addEventListener('click', changeWizardAttributes);
     setupFireball.addEventListener('click', changeWizardAttributes);
+
+    setupHandle.addEventListener('mousedown', onMouseDown);
   }
 };
 
@@ -163,6 +166,66 @@ var closePopup = function () {
   setupWizardCoat.removeEventListener('click', changeWizardAttributes);
   setupWizardEyes.removeEventListener('click', changeWizardAttributes);
   setupFireball.removeEventListener('click', changeWizardAttributes);
+
+  setup.style = '';
+  setupHandle.removeEventListener('mousedown', onMouseDown);
+};
+
+var onMouseDown = function (evt) {
+  evt.preventDefault();
+
+  var startCoordinates = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var isDragged = false;
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+    isDragged = true;
+
+    var shift = {
+      x: startCoordinates.x - moveEvt.clientX,
+      y: startCoordinates.y - moveEvt.clientY
+    };
+
+    startCoordinates = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    var coords = setup.getBoundingClientRect();
+
+    setup.style.left = (setup.offsetLeft - shift.x) + 'px';
+    setup.style.top = (setup.offsetTop - shift.y) + 'px';
+
+    if (coords.x + pageXOffset < 0) {
+      setup.style.left = '400px';
+    } else if (coords.y + pageYOffset < 0) {
+      setup.style.top = '0px';
+    } else if (coords.x + coords.width + pageXOffset > document.body.clientWidth) {
+      setup.style.left = (document.body.clientWidth - 401) + 'px';
+    }
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+
+    if (isDragged) {
+      var onClickPreventDefault = function (clickEvt) {
+        clickEvt.preventDefault();
+        setupHandle.removeEventListener('click', onClickPreventDefault);
+      };
+      setupHandle.addEventListener('click', onClickPreventDefault);
+    }
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
 };
 
 setupOpen.addEventListener('click', function () {
