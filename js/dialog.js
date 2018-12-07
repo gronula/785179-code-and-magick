@@ -1,75 +1,63 @@
 'use strict';
 
 (function () {
-  var WIZARD_NAMES = [
-    'Иван',
-    'Хуан Себастьян',
-    'Мария',
-    'Кристоф',
-    'Виктор',
-    'Юлия',
-    'Люпита',
-    'Вашингтон'
-  ];
+  var SIMILAR_WIZARDS_NUMBER = 4;
 
-  var WIZARD_SURNAMES = [
-    'да Марья',
-    'Верон',
-    'Мирабелла',
-    'Вальц',
-    'Онопко',
-    'Топольницкая',
-    'Нионго',
-    'Ирвинг'
-  ];
-
-  var getRandomArray = function (arrayLength) {
-    var array = [];
-
-    for (var i = 0; i < arrayLength; i++) {
-      var object = {};
-
-      object.name = window.util.getRandomArrayElement(WIZARD_NAMES) + ' ' + window.util.getRandomArrayElement(WIZARD_SURNAMES);
-      object.coatColor = window.util.getRandomArrayElement(window.colorize.COAT_COLORS);
-      object.eyesColor = window.util.getRandomArrayElement(window.colorize.EYES_COLORS);
-
-      array.push(object);
-    }
-
-    return array;
-  };
-
-  var wizards = getRandomArray(4);
-
-  // функция возвращает элемент, который используется в качестве шаблона
   var renderWizard = function (wizard) {
     var similarListElement = document.querySelector('.setup-similar-list');
     var similarWizardTemplate = document.querySelector('#similar-wizard-template');
     var similarItem = similarWizardTemplate.content.querySelector('.setup-similar-item');
     var fragment = document.createDocumentFragment();
+    var sortWizard = window.util.sortArrayRandom(wizard);
 
-    // в цикле добавляем элементы в DocumentFragment, чтобы не перерисовывать страницу каждый раз
-    for (var i = 0; i < wizard.length; i++) {
+    for (var i = 0; i < SIMILAR_WIZARDS_NUMBER; i++) {
       var wizardElement = similarItem.cloneNode(true);
 
-      // меняем имя волшебника, которое берётся из массива wizard
-      wizardElement.querySelector('.setup-similar-label').textContent = wizard[i].name;
-      // меняем цвет плаща волшебника
-      wizardElement.querySelector('.wizard-coat').style.fill = wizard[i].coatColor;
-      // меняем цвет глаз волшебника
-      wizardElement.querySelector('.wizard-eyes').style.fill = wizard[i].eyesColor;
+      wizardElement.querySelector('.setup-similar-label').textContent = sortWizard[i].name;
+      wizardElement.querySelector('.wizard-coat').style.fill = sortWizard[i].colorCoat;
+      wizardElement.querySelector('.wizard-eyes').style.fill = sortWizard[i].colorEyes;
 
       fragment.appendChild(wizardElement);
     }
 
-    // выводим содержимое DocumentFragment в DOM
     similarListElement.appendChild(fragment);
   };
 
-  renderWizard(wizards);
+  var successHandler = function (wizards) {
+    renderWizard(wizards);
+  };
+
+  var errorHandler = function (errorMessage) {
+    var error = document.querySelector('.error-message');
+    if (!error) {
+      var node = document.createElement('div');
+      node.classList.add('error-message');
+      node.style = 'z-index: 100; margin: 0 auto; text-align: center; background-color: red;';
+      node.style.position = 'absolute';
+      node.style.left = 0;
+      node.style.right = 0;
+      node.style.fontSize = '30px';
+
+      node.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', node);
+    }
+  };
+
+  window.backend.load(successHandler, errorHandler);
 
   var setup = document.querySelector('.setup');
 
-  // удаляем класс hidden у блока "Похожие персонажи"
   setup.querySelector('.setup-similar').classList.remove('hidden');
+
+  var form = setup.querySelector('.setup-wizard-form');
+  form.addEventListener('submit', function (evt) {
+    window.backend.save(new FormData(form), function () {
+      setup.classList.add('hidden');
+      var error = document.querySelector('.error-message');
+      if (error) {
+        document.body.removeChild(error);
+      }
+    }, errorHandler);
+    evt.preventDefault();
+  });
 })();

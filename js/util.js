@@ -17,6 +17,11 @@ window.util = (function () {
     },
     getRandomArrayElement: function (array) {
       return array[Math.floor(Math.random() * array.length)];
+    },
+    sortArrayRandom: function (array) {
+      return array.slice().sort(function () {
+        return Math.random() - 0.5;
+      });
     }
   };
 })();
