@@ -3,6 +3,9 @@
 (function () {
   var SIMILAR_WIZARDS_NUMBER = 4;
 
+  var setup = document.querySelector('.setup');
+  var setupOpen = document.querySelector('.setup-open');
+
   var renderWizard = function (wizard) {
     var similarListElement = document.querySelector('.setup-similar-list');
     var similarWizardTemplate = document.querySelector('#similar-wizard-template');
@@ -24,7 +27,9 @@
   };
 
   var successHandler = function (wizards) {
-    renderWizard(wizards);
+    if (!setup.querySelector('.setup-similar-item')) {
+      renderWizard(wizards);
+    }
   };
 
   var errorHandler = function (errorMessage) {
@@ -43,9 +48,17 @@
     }
   };
 
-  window.backend.load(successHandler, errorHandler);
+  var loadData = function () {
+    if (!setup.querySelector('.setup-similar-item')) {
+      window.backend.load(successHandler, errorHandler);
+    }
+    var error = document.querySelector('.error-message');
+    if (error) {
+      document.body.removeChild(error);
+    }
+  };
 
-  var setup = document.querySelector('.setup');
+  setupOpen.addEventListener('click', loadData);
 
   setup.querySelector('.setup-similar').classList.remove('hidden');
 
