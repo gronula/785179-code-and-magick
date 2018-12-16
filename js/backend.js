@@ -17,7 +17,7 @@ window.backend = (function () {
       onError('Запрос не успел выполниться за ' + xhr.timeout + 'мс');
     });
 
-    xhr.timeout = 55;
+    xhr.timeout = 10000;
   };
 
   return {

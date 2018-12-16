@@ -20,10 +20,13 @@
     var className = evt.target.classList;
     if (className.contains('wizard-coat')) {
       window.colorize.changingColor(setupWizardCoat, setupWizardCoatInput, 'fill', window.colorize.COAT_COLORS);
+      window.debounce(window.dialog.updateWizards);
     } else if (className.contains('wizard-eyes')) {
       window.colorize.changingColor(setupWizardEyes, setupWizardEyesInput, 'fill', window.colorize.EYES_COLORS);
+      window.debounce(window.dialog.updateWizards);
     } else if (className.contains('setup-fireball')) {
       window.colorize.changingColor(setupFireball, setupFireballInput, 'backgroundColor', window.colorize.FIREBALLS_COLORS);
+      window.debounce(window.dialog.updateWizards);
     }
   };
 
