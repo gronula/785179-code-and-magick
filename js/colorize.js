@@ -35,6 +35,7 @@ window.colorize = (function () {
       var color = window.util.getRandomArrayElement(colorsArray);
       element.style[cssProperty] = color;
       hideInput.value = color;
+      return color;
     }
   };
 })();
